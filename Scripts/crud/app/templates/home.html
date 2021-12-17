@@ -1,0 +1,301 @@
+
+  <!DOCTYPE html>
+  <html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='node_modules/bootstrap/dist/css/bootstrap.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='sidemenu.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"></script>
+    <title>Dashboard</title>
+  </head>
+  <body>
+    {% if current_user.is_authenticated %}
+    <div class="wrapper">
+      <!-- Sidebar  -->
+      <nav id="sidebar">
+        <div class="sidebar-header">
+          <h3>Tom Barbearia</h3>
+          <a>Bem vindo {{ current_user.nome }} </a><br>
+          <a style ="color:red" href = "{{ url_for('logout') }} ">Sair</a>
+        </div>
+
+        <ul class="list-unstyled components">
+          <li>
+            <a href="{{ url_for('home') }}">Dashboard</a>
+          </li>
+          <li>
+            <a href="{{ url_for('financeiro') }}">Financeiro</a>
+          </li>
+          <li>
+            <a href="{{ url_for('agenda') }}">Agenda</a>
+          </li>
+          <li>
+            <a href="{{ url_for('clientes') }}">Clientes</a>
+          </li>
+          <li>
+            <a href="{{ url_for('servicos') }}">Serviços</a>
+          </li>
+        </ul>  
+      </nav>
+      <!-- Contúdo da página  -->
+      <div id="content">
+        <div class="container-fluid"> 
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="card text-white bg-danger mb-3" style="width:650px;">
+              <div class="card-body" >
+                <h5 class="card-title">Próximos Clientes</h5>
+                <table class="table table-light table-striped table-hover text-center" id="tableDashboard" >
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Descrição do Serviço</th>
+                      <th scope="col">Data</th>
+                      <th scope="col">Horário</th>
+                      <th scope="col">Cliente</th>
+                      <th scope="col">Status</th>
+                    </tr>
+                  </thead>
+                  {% for servicoagendado in servicosagendados %}
+                  <tbody>
+                    <tr>
+                      <th scope="row">{{ servicoagendado.id_servico_agendado }}</th>
+                      <td>{{ servicoagendado.desc_servico }}</td>
+                      <td>{{ servicoagendado.data_agendamento }}</td>
+                      <td>{{ servicoagendado.horario_agendado }}</td>
+                      <td>{{ servicoagendado.nm_cliente }}</td>
+                      <td>{{ servicoagendado.desc_status }}</td>
+                    </tr>
+                  </tbody>
+                  {% endfor %}
+                </table>
+                
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6" align="Right">
+            <div class="card text-white bg-primary mb-3" style="width:400px;" >
+              <div class="card-body">
+                <h5 class="card-title" align="Left">Faturamento do Dia</h5>
+                <table class="table table-light">
+                  <thead>
+                    <tr>
+                      <th scope="col">Valor Total</th>
+                      <th scope="col">Ultima Atualização</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>R$ {{ total }},00</td>
+                      <td>{{ ultimaAtualizacao }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="justify-content-center row graficor">
+          <div style="background-color: rgb(255, 255, 255); width: auto; height: auto;">
+          <canvas id="myChart" width="500" height="400"></canvas>
+          </div>
+        </div>
+        <br>
+        </br>
+
+
+        <div class="justify-content-center row w-100 m-0" align ="Center">
+          <div class="col-6">
+            <h4 style="color:cadetblue">Serviços Concluídos</h4>
+            <canvas id="CONCLUIDOS" width="80%" height="400"></canvas>
+          </div>
+          <div class="col-6">
+            <h4 style="color:cadetblue">Serviços Cancelados</h4>
+            <canvas id="CANCELADOS" width="80%" height="400"></canvas>
+          </div>
+        </div>&nbsp&nbsp
+
+        <br>
+        </br>
+
+        
+        
+
+        </div>
+        <script>
+          let chart = new Chart(document.getElementById("myChart"), {
+              type: "bar",
+              data: {
+                  labels:["Jan", "Fev", "Mar", "Apr", "May", "Jun","Jul","Ago","Set","Out","Nov","Dez"],
+                  datasets: [
+                      {
+                          label: "Serviços Agendados", title:'Serviços Agendados',
+                          data: [{{janSearch}},{{fevSearch}},{{marSearch}},{{abrSearch}},{{maiSearch}},{{junSearch}},{{julSearch}},{{agoSearch}},{{setSearch}},{{outSearch}},{{novSearch}},{{dezSearch}}],
+                          backgroundColor: [
+                              'rgba(255, 99, 132, 0.3)',
+                              'rgba(54, 162, 235, 0.3)',
+                              'rgba(255, 206, 86, 0.3)',
+                              'rgba(75, 192, 192, 0.3)',
+                              'rgba(153, 102, 255, 0.3)',
+                              'rgba(255, 159, 64, 0.3)',
+                              'rgba(105, 17, 332, 0.3)',
+                              'rgba(42, 200, 305, 0.3)',
+                              'rgba(5, 206, 86, 0.3)',
+                              'rgba(100, 22, 52, 0.3)',
+                              'rgba(253, 12, 35, 0.3)',
+                              'rgba(205, 19, 124, 0.3)'
+                          ],
+                          borderColor: [
+                              'rgba(255, 99, 132, 1)',
+                              'rgba(54, 162, 235, 1)',
+                              'rgba(255, 206, 86, 1)',
+                              'rgba(75, 192, 192, 1)',
+                              'rgba(153, 102, 255, 1)',
+                              'rgba(255, 159, 64, 1)',
+                              'rgba(105, 17, 332, 1)',
+                              'rgba(42, 200, 305, 1)',
+                              'rgba(5, 206, 86, 1)',
+                              'rgba(100, 22, 52, 1)',
+                              'rgba(253, 12, 35, 1)',
+                              'rgba(205, 19, 124, 1)'
+                          ],
+                          borderWidth: 3
+                      }
+                  ]
+              },
+              options: {
+                  
+                  title: {
+                      display: true,
+                      text:"Novos Clientes"
+                  },
+                  scales: {
+                      yAxes: [
+                          {
+                              ticks:{
+                                  beginAtZero: true
+                              }
+                          }
+                      ]
+                  }
+              }
+          })
+
+        
+        let CONCLUIDOS = new Chart(document.getElementById("CONCLUIDOS"), {
+              type: "doughnut",
+              data: {
+                  labels:["Cabelo","Barba","Tintura","Luzes","Sobrancelha","Penteado"],
+                  datasets: [
+                      {
+                          label: "Serviços Agendados", title:'Serviços Agendados',
+                          data: [{{cabeloSearch}},{{barbaSearch}},{{tinturaSearch}},{{luzesSearch}},{{sombrancelhaSearch}},{{penteadoSearch}}],
+                          backgroundColor: [
+                              'rgba(255, 99, 132, 1)',
+                              'rgba(54, 162, 235, 1)',
+                              'rgba(255, 206, 86, 1)',
+                              'rgba(75, 192, 192, 1)',
+                              'rgba(153, 102, 255, 1)',
+                              'rgba(255, 159, 64, 1)',
+                              'rgba(105, 17, 332, 1)',
+                              'rgba(42, 200, 305, 1)',
+                              'rgba(5, 206, 86, 1)',
+                              'rgba(100, 22, 52, 1)',
+                              'rgba(253, 12, 35, 1)',
+                              'rgba(205, 19, 124, 1)'
+                          ]
+                      }
+                  ]
+              },
+              options: {
+                  
+                  title: {
+                      display: true,
+                      text:"Novos Clientes"
+                  },
+                  scales: {
+                      yAxes: [
+                          {
+                              ticks:{
+                                  beginAtZero: true
+                              }
+                          }
+                      ]
+                  }
+              }
+          })
+
+          // setup
+          let data ={
+            labels:["Cabelo","Barba","Tintura","Luzes","Sobrancelha","Penteado"],
+              datasets: [
+                  {
+                      label:'Serviços Cancelados', 
+                      title:'Serviços Cancelados',
+                      data: [{{cabeloCanceladoSearch}},{{barbaCanceladoSearch}},{{tinturaCanceladoSearch}},{{luzesCanceladoSearch}},{{sombrancelhaCanceladoSearch}},{{penteadoCanceladoSearch}}],
+                      backgroundColor: [
+                          'rgba(255, 99, 132, 1)',
+                          'rgba(54, 162, 235, 1)',
+                          'rgba(255, 206, 86, 1)',
+                          'rgba(75, 192, 192, 1)',
+                          'rgba(153, 102, 255, 1)',
+                          'rgba(255, 159, 64, 1)',
+                          'rgba(105, 17, 332, 1)',
+                          'rgba(42, 200, 305, 1)',
+                          'rgba(5, 206, 86, 1)',
+                          'rgba(100, 22, 52, 1)',
+                          'rgba(253, 12, 35, 1)',
+                          'rgba(205, 19, 124, 1)'
+                      ]
+                  }
+              ]
+          }
+
+
+          // const 
+          let config ={
+            type: "doughnut",
+              data,
+              options: {
+                title: {
+                    display: true,
+                    text:"Novos Clientes"
+                },
+                scales: {
+                    yAxes: [
+                        {
+                            ticks:{
+                                beginAtZero: true
+                            }
+                        }
+                    ]
+                }
+            }
+          }
+
+
+          let CANCELADOS = new Chart(document.getElementById("CANCELADOS"), config);
+  
+      </script>
+
+      </div> 
+    </div>
+
+    {% else %}
+            <div>
+                <h1>Visitante</h1>
+                <p>Bem Vindo, faça login para poder acessar o menu.</p>
+                <a href="{{ url_for('login') }}"><button class="btn btn-dark" type="button" value ="login">Login</button></a>
+            </div>
+    {% endif %}
+    <script src="{{ url_for('static',filename='node_modules/popper.js/dist/umd/popper.js') }}"></script>
+    <script src="{{ url_for('static',filename='node_modules/jquery/dist/jquery.js') }}"></script>
+    <script src="{{ url_for('static',filename='node_modules/jquery/dist/main.js') }}"></script>
+    <script src="{{ url_for('static',filename='node_modules/jquery/dist/jquerymask/src/jquery.mask.js') }}"></script>
+  </body>
+  </html>
