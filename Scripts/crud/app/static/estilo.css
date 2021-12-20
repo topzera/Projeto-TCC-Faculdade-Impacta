@@ -1,5 +1,5 @@
 body {
-    background-image: linear-gradient(to right, red, black, blue);
+    background-image: linear-gradient(to center, gray, black);
     font-family: sans-serif;
 }
 
@@ -229,4 +229,8 @@ body {
   appearance: none;
   border-radius: 0.25rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.financeiroTotal {
+    color: white;
 }

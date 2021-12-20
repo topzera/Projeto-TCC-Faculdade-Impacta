@@ -1,7 +1,7 @@
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
 body {
     font-family: 'Poppins', sans-serif;
-    background-image: linear-gradient(to right, red, black, blue)
+    background-image: linear-gradient(to right, gray, black)
 }
 
 p {
